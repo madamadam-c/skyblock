@@ -43,6 +43,18 @@ public final class DamageService {
         );
     }
 
+    public double calculateAbilityDamage(Player attacker,
+                                         double baseAbilityDamage,
+                                         double abilityScaling,
+                                         double additiveMultiplier,
+                                         double multiplicativeMultiplier,
+                                         double bonusModifiers) {
+        double intelligence = getStat(attacker, StatType.INTELLIGENCE);
+        double scaled = baseAbilityDamage * (1.0 + (intelligence / 100.0) * abilityScaling);
+        double combined = scaled * additiveMultiplier * multiplicativeMultiplier;
+        return combined + bonusModifiers;
+    }
+
     private double getStat(LivingEntity attacker, StatType statType) {
         if (attacker instanceof Player player) {
             return statsService.get(player.getUniqueId(), statType).getValue();

@@ -18,8 +18,9 @@ public final class CalculateDamageListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getDamageSource().getCausingEntity() instanceof Player p)) return;
+        if (!(event.getDamageSource().getDirectEntity() instanceof Player p)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
+        if (p.getScoreboardTags().contains("ability_damage")) return;
 
         double weaponDamage = event.getDamage();
         DamageRequest request = new DamageRequest(
