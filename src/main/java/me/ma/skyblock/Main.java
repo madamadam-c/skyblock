@@ -15,7 +15,7 @@ import me.ma.skyblock.rng.ThreadLocalRNG;
 import me.ma.skyblock.showdamage.ShowDamageListener;
 import me.ma.skyblock.stats.AlterStatsListener;
 import me.ma.skyblock.stats.CalculateDamageListener;
-import me.ma.skyblock.stats.DamageCalculator;
+import me.ma.skyblock.stats.DamageService;
 import me.ma.skyblock.stats.StatCommand;
 import me.ma.skyblock.stats.StatsService;
 import me.ma.skyblock.stats.resources.ResourceCommand;
@@ -23,7 +23,7 @@ import me.ma.skyblock.stats.resources.ResourceService;
 
 public class Main extends JavaPlugin {
     @Getter private static Main plugin;
-    private DamageCalculator damageCalculator;
+    private DamageService damageService;
     @Getter private StatsService statsService;
     private ResourceService resourceService;
 
@@ -35,8 +35,8 @@ public class Main extends JavaPlugin {
         plugin = this;
 
         playerDamageText = new HashMap<>();
-        damageCalculator = new DamageCalculator(new ThreadLocalRNG());
         statsService = new StatsService();
+        damageService = new DamageService(statsService, new ThreadLocalRNG());
         resourceService = new ResourceService();
 
         registerListeners();
@@ -51,7 +51,7 @@ public class Main extends JavaPlugin {
     private void registerListeners() {
         this.getServer().getPluginManager().registerEvents(new UseAbilityListener(resourceService), this);
         this.getServer().getPluginManager().registerEvents(new ShowDamageListener(), this);
-        this.getServer().getPluginManager().registerEvents(new CalculateDamageListener(damageCalculator, statsService), this);
+        this.getServer().getPluginManager().registerEvents(new CalculateDamageListener(damageService), this);
         this.getServer().getPluginManager().registerEvents(new AlterStatsListener(statsService, resourceService), this);
     }
 

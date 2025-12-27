@@ -1,5 +1,8 @@
 package me.ma.skyblock.stats;
 
+import java.util.Set;
+
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -7,27 +10,27 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public final class CalculateDamageListener implements Listener {
-    private final StatsService statsService;
-    private final DamageCalculator damageCalculator;
+    private final DamageService damageService;
 
-    public CalculateDamageListener(DamageCalculator damageCalculator, StatsService statsService) {
-        this.damageCalculator = damageCalculator;
-        this.statsService = statsService;
+    public CalculateDamageListener(DamageService damageService) {
+        this.damageService = damageService;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamageSource().getCausingEntity() instanceof Player p)) return;
-        var uuid = p.getUniqueId();
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
 
         double weaponDamage = event.getDamage();
-        DamageCalculator.DamageResult r = damageCalculator.calculate(
-            weaponDamage, 
-            statsService.get(uuid, StatType.STRENGTH).getValue(),
-            statsService.get(uuid, StatType.CRIT_CHANCE).getValue(),
-            statsService.get(uuid, StatType.CRIT_DAMAGE).getValue()
+        DamageRequest request = new DamageRequest(
+            p,
+            target,
+            weaponDamage,
+            DamageType.MELEE,
+            Set.of("MELEE")
         );
 
-        event.setDamage(r.finalDamage());
+        DamageResult result = damageService.calculate(request);
+        event.setDamage(result.finalDamage());
     }
 }
