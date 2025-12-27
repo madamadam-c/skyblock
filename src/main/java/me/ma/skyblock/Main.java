@@ -55,7 +55,7 @@ public class Main extends JavaPlugin {
     }
 
     private void registerListeners() {
-        this.getServer().getPluginManager().registerEvents(new UseAbilityListener(resourceService), this);
+        this.getServer().getPluginManager().registerEvents(new UseAbilityListener(statsService, resourceService), this);
         this.getServer().getPluginManager().registerEvents(new ShowDamageListener(), this);
         this.getServer().getPluginManager().registerEvents(new CalculateDamageListener(damageService), this);
         this.getServer().getPluginManager().registerEvents(new AlterStatsListener(statsService, resourceService), this);
