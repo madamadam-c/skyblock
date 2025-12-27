@@ -107,9 +107,11 @@ public final class DamageService {
                                          double multiplicativeMultiplier,
                                          double bonusModifiers) {
         double intelligence = getStat(attacker, StatType.INTELLIGENCE);
+        double abilityDamage = getStat(attacker, StatType.ABILITY_DAMAGE);
+        double abilityDamageMultiplier = 1.0 + (abilityDamage / 100.0);
         double scaled = baseAbilityDamage * (1.0 + (intelligence / 100.0) * abilityScaling);
         double combined = scaled * additiveMultiplier * multiplicativeMultiplier;
-        return combined + bonusModifiers;
+        return (combined + bonusModifiers) * abilityDamageMultiplier;
     }
 
     public void applyAbilityDamage(Player caster,
