@@ -11,7 +11,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     private final StatsService statsService;
 
     private static final List<String> SUBS = List.of("get", "set", "reset");
-    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage");
+    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage", "intelligence", "speed");
 
     public StatCommand(StatsService statsService) {
         this.statsService = statsService;
@@ -21,7 +21,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage("Usage:");
-            sender.sendMessage("/stat get <player> [strength|crit_chance|crit_damage]");
+            sender.sendMessage("/stat get <player> [strength|crit_chance|crit_damage|intelligence|speed]");
             sender.sendMessage("/stat set <player> <stat> <value>");
             sender.sendMessage("/stat reset <player> [stat]");
             return true;
@@ -59,6 +59,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("  crit_chance=" + statsService.get(uuid, StatType.CRIT_CHANCE).getValue());
             sender.sendMessage("  crit_damage=" + statsService.get(uuid, StatType.CRIT_DAMAGE).getValue());
             sender.sendMessage("  intelligence=" + statsService.get(uuid, StatType.INTELLIGENCE).getValue());
+            sender.sendMessage("  speed=" + statsService.get(uuid, StatType.SPEED).getValue());
             return true;
         }
 

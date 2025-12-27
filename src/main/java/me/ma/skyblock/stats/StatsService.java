@@ -21,7 +21,8 @@ public final class StatsService {
             StatType.STRENGTH, new Stat(100.0),
             StatType.CRIT_CHANCE, new Stat(30.0),
             StatType.CRIT_DAMAGE, new Stat(50.0),
-            StatType.INTELLIGENCE, new Stat(0.0)
+            StatType.INTELLIGENCE, new Stat(0.0),
+            StatType.SPEED, new Stat(100.0)
         ));
     }
 
