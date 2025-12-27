@@ -11,31 +11,10 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     private final StatsService statsService;
 
     private static final List<String> SUBS = List.of("get", "set", "reset");
-    private static final List<String> STAT_NAMES = List.of(
-            "health",
-            "defense",
-            "true_defense",
-            "ability_damage",
-            "speed",
-            "crit_chance",
-            "crit_damage",
-            "strength",
-            "intelligence",
-            "damage"
-    );
+    private static final List<String> STAT_NAMES = Arrays.stream(StatType.values())
+            .map(statType -> statType.name().toLowerCase(Locale.ROOT))
+            .collect(Collectors.toList());
     private static final String STAT_LIST = String.join("|", STAT_NAMES);
-    private static final List<StatType> STAT_TYPES = List.of(
-            StatType.HEALTH,
-            StatType.DEFENSE,
-            StatType.TRUE_DEFENSE,
-            StatType.ABILITY_DAMAGE,
-            StatType.SPEED,
-            StatType.CRIT_CHANCE,
-            StatType.CRIT_DAMAGE,
-            StatType.STRENGTH,
-            StatType.INTELLIGENCE,
-            StatType.DAMAGE
-    );
 
     public StatCommand(StatsService statsService) {
         this.statsService = statsService;
@@ -79,7 +58,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
         UUID uuid = target.getUniqueId();
         if (args.length == 2) {
             sender.sendMessage(target.getName() + " stats:");
-            for (StatType statType : STAT_TYPES) {
+            for (StatType statType : StatType.values()) {
                 sender.sendMessage("  " + statType.name().toLowerCase(Locale.ROOT) + "="
                         + statsService.get(uuid, statType).getValue());
             }
