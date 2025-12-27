@@ -18,10 +18,16 @@ public final class StatsService {
 
     private EnumMap<StatType, Stat> defaults() {
         return new EnumMap<StatType, Stat>(Map.of(
-            StatType.STRENGTH, new Stat(100.0),
+            StatType.HEALTH, new Stat(100.0),
+            StatType.DEFENSE, new Stat(0.0),
+            StatType.TRUE_DEFENSE, new Stat(0.0),
+            StatType.ABILITY_DAMAGE, new Stat(0.0),
+            StatType.SPEED, new Stat(100.0),
             StatType.CRIT_CHANCE, new Stat(30.0),
             StatType.CRIT_DAMAGE, new Stat(50.0),
-            StatType.INTELLIGENCE, new Stat(0.0)
+            StatType.STRENGTH, new Stat(100.0),
+            StatType.INTELLIGENCE, new Stat(0.0),
+            StatType.DAMAGE, new Stat(0.0)
         ));
     }
 

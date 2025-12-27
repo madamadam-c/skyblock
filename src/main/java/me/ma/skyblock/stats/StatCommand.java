@@ -11,7 +11,31 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     private final StatsService statsService;
 
     private static final List<String> SUBS = List.of("get", "set", "reset");
-    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage");
+    private static final List<String> STAT_NAMES = List.of(
+            "health",
+            "defense",
+            "true_defense",
+            "ability_damage",
+            "speed",
+            "crit_chance",
+            "crit_damage",
+            "strength",
+            "intelligence",
+            "damage"
+    );
+    private static final String STAT_LIST = String.join("|", STAT_NAMES);
+    private static final List<StatType> STAT_TYPES = List.of(
+            StatType.HEALTH,
+            StatType.DEFENSE,
+            StatType.TRUE_DEFENSE,
+            StatType.ABILITY_DAMAGE,
+            StatType.SPEED,
+            StatType.CRIT_CHANCE,
+            StatType.CRIT_DAMAGE,
+            StatType.STRENGTH,
+            StatType.INTELLIGENCE,
+            StatType.DAMAGE
+    );
 
     public StatCommand(StatsService statsService) {
         this.statsService = statsService;
@@ -21,9 +45,9 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage("Usage:");
-            sender.sendMessage("/stat get <player> [strength|crit_chance|crit_damage]");
-            sender.sendMessage("/stat set <player> <stat> <value>");
-            sender.sendMessage("/stat reset <player> [stat]");
+            sender.sendMessage("/stat get <player> [" + STAT_LIST + "]");
+            sender.sendMessage("/stat set <player> <stat> <value> (stat: " + STAT_LIST + ")");
+            sender.sendMessage("/stat reset <player> [stat] (stat: " + STAT_LIST + ")");
             return true;
         }
 
@@ -42,7 +66,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleGet(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage("Usage: /stat get <player> [stat]");
+            sender.sendMessage("Usage: /stat get <player> [" + STAT_LIST + "]");
             return true;
         }
 
@@ -55,10 +79,10 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
         UUID uuid = target.getUniqueId();
         if (args.length == 2) {
             sender.sendMessage(target.getName() + " stats:");
-            sender.sendMessage("  strength=" + statsService.get(uuid, StatType.STRENGTH).getValue());
-            sender.sendMessage("  crit_chance=" + statsService.get(uuid, StatType.CRIT_CHANCE).getValue());
-            sender.sendMessage("  crit_damage=" + statsService.get(uuid, StatType.CRIT_DAMAGE).getValue());
-            sender.sendMessage("  intelligence=" + statsService.get(uuid, StatType.INTELLIGENCE).getValue());
+            for (StatType statType : STAT_TYPES) {
+                sender.sendMessage("  " + statType.name().toLowerCase(Locale.ROOT) + "="
+                        + statsService.get(uuid, statType).getValue());
+            }
             return true;
         }
 
@@ -74,7 +98,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleSet(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            sender.sendMessage("Usage: /stat set <player> <stat> <value>");
+            sender.sendMessage("Usage: /stat set <player> <stat> <value> (stat: " + STAT_LIST + ")");
             return true;
         }
 
@@ -105,7 +129,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleReset(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage("Usage: /stat reset <player> [stat]");
+            sender.sendMessage("Usage: /stat reset <player> [stat] (stat: " + STAT_LIST + ")");
             return true;
         }
 
