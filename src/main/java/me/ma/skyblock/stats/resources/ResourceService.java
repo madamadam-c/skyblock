@@ -1,22 +1,26 @@
 package me.ma.skyblock.stats.resources;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 
 import me.ma.skyblock.Main;
 import me.ma.skyblock.stats.StatType;
+import me.ma.skyblock.tick.TickEngine;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public final class ResourceService {
     private final Map<UUID, EnumMap<ResourceType, Resource>> perPlayerResources = new ConcurrentHashMap<>();
-    private final Map<UUID, BukkitTask> playerRunnableMap = new HashMap<>();
+    private final TickEngine tickEngine;
+
+    public ResourceService(TickEngine tickEngine) {
+        this.tickEngine = tickEngine;
+        this.tickEngine.runEvery(20, this::tickSecond);
+    }
     
     public Resource get(UUID playerID, ResourceType resourceType) {
         return perPlayerResources.computeIfAbsent(playerID, t -> defaults()).get(resourceType);
@@ -37,34 +41,10 @@ public final class ResourceService {
     
     public void addPlayer(UUID playerID) {
         perPlayerResources.put(playerID, defaults());
-
-        BukkitTask task = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
-            get(playerID, ResourceType.MANA).setMaxValue(Main.getPlugin().getStatsService().get(playerID, StatType.INTELLIGENCE).getValue() + 100.0);
-            
-            for (var key : perPlayerResources.get(playerID).keySet()) {
-                double increase = get(playerID, key).getMaxValue() * (0.02);
-                set(playerID, key, Math.min(get(playerID, key).getMaxValue(), get(playerID, key).getValue() + increase));
-            }
-
-            var player = Bukkit.getPlayer(playerID);
-            if (player != null) {
-                var inf = get(playerID, ResourceType.MANA);
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(
-                    "MANA: " + inf.getValue() + " / " + inf.getMaxValue()
-                ));
-            }
-        }, 20, 20);
-
-        playerRunnableMap.put(playerID, task);
     }
 
     public void removePlayer(UUID playerID) {
         perPlayerResources.remove(playerID);
-
-        if (playerRunnableMap.containsKey(playerID)) {
-            playerRunnableMap.get(playerID).cancel();
-            playerRunnableMap.remove(playerID);
-        }
     }
 
     public void reset(UUID playerID) {
@@ -73,5 +53,26 @@ public final class ResourceService {
 
     public void reset(UUID playerID, ResourceType resourceType) {
         perPlayerResources.get(playerID).put(resourceType, defaults().get(resourceType));
+    }
+
+    private void tickSecond() {
+        for (var entry : perPlayerResources.entrySet()) {
+            UUID playerID = entry.getKey();
+            var resources = entry.getValue();
+            var mana = resources.get(ResourceType.MANA);
+            mana.setMaxValue(Main.getPlugin().getStatsService().get(playerID, StatType.INTELLIGENCE).getValue() + 100.0);
+
+            for (var key : resources.keySet()) {
+                double increase = get(playerID, key).getMaxValue() * (0.02);
+                set(playerID, key, Math.min(get(playerID, key).getMaxValue(), get(playerID, key).getValue() + increase));
+            }
+
+            var player = Bukkit.getPlayer(playerID);
+            if (player != null) {
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(
+                    "MANA: " + mana.getValue() + " / " + mana.getMaxValue()
+                ));
+            }
+        }
     }
 }

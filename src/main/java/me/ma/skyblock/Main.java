@@ -20,12 +20,14 @@ import me.ma.skyblock.stats.StatCommand;
 import me.ma.skyblock.stats.StatsService;
 import me.ma.skyblock.stats.resources.ResourceCommand;
 import me.ma.skyblock.stats.resources.ResourceService;
+import me.ma.skyblock.tick.TickEngine;
 
 public class Main extends JavaPlugin {
     @Getter private static Main plugin;
     private DamageService damageService;
     @Getter private StatsService statsService;
     private ResourceService resourceService;
+    private TickEngine tickEngine;
 
     @Getter private final NamespacedKey abilitiesKey = new NamespacedKey(this, "abilities");
     @Getter private Map<UUID, TextDisplay> playerDamageText;
@@ -36,8 +38,10 @@ public class Main extends JavaPlugin {
 
         playerDamageText = new HashMap<>();
         statsService = new StatsService();
+        tickEngine = new TickEngine(this);
+        tickEngine.start();
         damageService = new DamageService(statsService, new ThreadLocalRNG());
-        resourceService = new ResourceService();
+        resourceService = new ResourceService(tickEngine);
 
         registerListeners();
         registerCommands();
@@ -45,7 +49,9 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        if (tickEngine != null) {
+            tickEngine.stop();
+        }
     }
 
     private void registerListeners() {
