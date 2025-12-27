@@ -21,8 +21,13 @@ public final class StatsService {
             StatType.STRENGTH, new Stat(100.0),
             StatType.CRIT_CHANCE, new Stat(30.0),
             StatType.CRIT_DAMAGE, new Stat(50.0),
-            StatType.INTELLIGENCE, new Stat(0.0)
+            StatType.INTELLIGENCE, new Stat(0.0),
+            StatType.DEFENSE, new Stat(0.0)
         ));
+    }
+
+    public static double effectiveHealth(double health, double defense) {
+        return health * (1 + defense / 100);
     }
 
     public void addPlayer(UUID playerID) {

@@ -11,7 +11,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     private final StatsService statsService;
 
     private static final List<String> SUBS = List.of("get", "set", "reset");
-    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage");
+    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage", "intelligence", "defense");
 
     public StatCommand(StatsService statsService) {
         this.statsService = statsService;
@@ -59,6 +59,10 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("  crit_chance=" + statsService.get(uuid, StatType.CRIT_CHANCE).getValue());
             sender.sendMessage("  crit_damage=" + statsService.get(uuid, StatType.CRIT_DAMAGE).getValue());
             sender.sendMessage("  intelligence=" + statsService.get(uuid, StatType.INTELLIGENCE).getValue());
+            sender.sendMessage("  defense=" + statsService.get(uuid, StatType.DEFENSE).getValue());
+            double maxHealth = target.getMaxHealth();
+            double defense = statsService.get(uuid, StatType.DEFENSE).getValue();
+            sender.sendMessage("  effective_health=" + StatsService.effectiveHealth(maxHealth, defense));
             return true;
         }
 
