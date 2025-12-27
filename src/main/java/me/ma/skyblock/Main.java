@@ -12,7 +12,6 @@ import lombok.Getter;
 import me.ma.skyblock.abilities.ItemAbilityCommand;
 import me.ma.skyblock.abilities.UseAbilityListener;
 import me.ma.skyblock.rng.ThreadLocalRNG;
-import me.ma.skyblock.showdamage.ShowDamageListener;
 import me.ma.skyblock.stats.AlterStatsListener;
 import me.ma.skyblock.stats.CalculateDamageListener;
 import me.ma.skyblock.stats.DamageService;
@@ -56,7 +55,6 @@ public class Main extends JavaPlugin {
 
     private void registerListeners() {
         this.getServer().getPluginManager().registerEvents(new UseAbilityListener(statsService, resourceService), this);
-        this.getServer().getPluginManager().registerEvents(new ShowDamageListener(), this);
         this.getServer().getPluginManager().registerEvents(new CalculateDamageListener(damageService), this);
         this.getServer().getPluginManager().registerEvents(new AlterStatsListener(statsService, resourceService), this);
     }
