@@ -24,7 +24,7 @@ import me.ma.skyblock.tick.TickEngine;
 
 public class Main extends JavaPlugin {
     @Getter private static Main plugin;
-    private DamageService damageService;
+    @Getter private DamageService damageService;
     @Getter private StatsService statsService;
     private ResourceService resourceService;
     private TickEngine tickEngine;
