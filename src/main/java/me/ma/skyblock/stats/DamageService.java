@@ -55,6 +55,28 @@ public final class DamageService {
         return combined + bonusModifiers;
     }
 
+    public void applyAbilityDamage(Player caster,
+                                   LivingEntity target,
+                                   double baseDamage,
+                                   double scaling,
+                                   double addMult,
+                                   double multMult,
+                                   double bonus) {
+        double damage = calculateAbilityDamage(caster, baseDamage, scaling, addMult, multMult, bonus);
+        String tag = "ability_damage";
+        boolean hadTag = caster.getScoreboardTags().contains(tag);
+        if (!hadTag) {
+            caster.addScoreboardTag(tag);
+        }
+        try {
+            target.damage(damage, caster);
+        } finally {
+            if (!hadTag) {
+                caster.removeScoreboardTag(tag);
+            }
+        }
+    }
+
     private double getStat(LivingEntity attacker, StatType statType) {
         if (attacker instanceof Player player) {
             return statsService.get(player.getUniqueId(), statType).getValue();

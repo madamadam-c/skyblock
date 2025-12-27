@@ -92,24 +92,18 @@ public enum Ability {
     }),
     MAGIC_NOVA("MAGIC_NOVA", 0.0, (AbilityContext context) -> {
         Player p = context.getCaster();
-        double damage = Main.getPlugin().getDamageService().calculateAbilityDamage(
-            p,
-            10.0,
-            1.0,
-            1.0,
-            1.0,
-            0.0
-        );
-        String tag = "ability_damage";
-        p.addScoreboardTag(tag);
-        try {
-            for (Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 3.0, 3.0, 3.0)) {
-                if (!(entity instanceof LivingEntity target)) continue;
-                if (target.equals(p)) continue;
-                target.damage(damage, p);
-            }
-        } finally {
-            p.removeScoreboardTag(tag);
+        for (Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 3.0, 3.0, 3.0)) {
+            if (!(entity instanceof LivingEntity target)) continue;
+            if (target.equals(p)) continue;
+            Main.getPlugin().getDamageService().applyAbilityDamage(
+                p,
+                target,
+                10.0,
+                1.0,
+                1.0,
+                1.0,
+                0.0
+            );
         }
     });
 
