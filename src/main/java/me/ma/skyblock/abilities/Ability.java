@@ -19,11 +19,13 @@ import me.ma.skyblock.Main;
 import me.ma.skyblock.utils.LocationUtils;
 
 public enum Ability {
-    DEFAULT("DEFAULT", 0.0, (Player p) -> {}),
-    INSTANT_TRANSMISSION("INSTANT_TRANSMISSION", 50.0, (Player p) -> {
+    DEFAULT("DEFAULT", 0.0, (AbilityContext context) -> {}),
+    INSTANT_TRANSMISSION("INSTANT_TRANSMISSION", 50.0, (AbilityContext context) -> {
+        Player p = context.getCaster();
         p.teleport(p.getLocation().add(new Vector(0, 1, 0)));
     }),
-    BLINK("BLINK", 25.0, (Player p) -> {
+    BLINK("BLINK", 25.0, (AbilityContext context) -> {
+        Player p = context.getCaster();
         var w = p.getWorld();
         var dir = p.getLocation().getDirection().clone();
         dir.setY(0);
@@ -62,7 +64,8 @@ public enum Ability {
         if (!LocationUtils.isSafeForPlayer(dest)) return;
         p.teleport(dest);
     }),
-    ICE_PRISON("ICE_PRISON", 45.0, (Player p) -> {
+    ICE_PRISON("ICE_PRISON", 45.0, (AbilityContext context) -> {
+        Player p = context.getCaster();
         var hit = p.getWorld().rayTraceBlocks(p.getEyeLocation(), p.getEyeLocation().getDirection(), 10.0);
         if (hit == null || hit.getHitBlock() == null) return;
     
@@ -87,7 +90,8 @@ public enum Ability {
             }
         }, 60L);
     }),
-    MAGIC_NOVA("MAGIC_NOVA", 0.0, (Player p) -> {
+    MAGIC_NOVA("MAGIC_NOVA", 0.0, (AbilityContext context) -> {
+        Player p = context.getCaster();
         double damage = Main.getPlugin().getDamageService().calculateAbilityDamage(
             p,
             10.0,
@@ -110,17 +114,17 @@ public enum Ability {
     });
 
     private final double manaCost;
-    private final Consumer<Player> ability;
+    private final Consumer<AbilityContext> ability;
     @Getter private final String id;
 
-    Ability(String id, double baseCost, Consumer<Player> ability) {
+    Ability(String id, double baseCost, Consumer<AbilityContext> ability) {
         this.manaCost = baseCost;
         this.ability = ability;
         this.id = id;
     }
 
-    public void run(Player player) {
-        this.ability.accept(player);
+    public void run(AbilityContext context) {
+        this.ability.accept(context);
     }
 
     public double getAbilityCost() {

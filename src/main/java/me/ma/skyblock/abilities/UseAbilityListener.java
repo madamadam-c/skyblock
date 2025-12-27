@@ -10,12 +10,16 @@ import org.bukkit.inventory.ItemStack;
 import com.jeff_media.morepersistentdatatypes.DataType;
 
 import me.ma.skyblock.Main;
+import me.ma.skyblock.stats.StatsService;
 import me.ma.skyblock.stats.resources.ResourceService;
 import me.ma.skyblock.stats.resources.ResourceType;
 
 public class UseAbilityListener implements Listener {
     private final ResourceService resourceService;
-    public UseAbilityListener(ResourceService resourceService) {
+    private final StatsService statsService;
+
+    public UseAbilityListener(StatsService statsService, ResourceService resourceService) {
+        this.statsService = statsService;
         this.resourceService = resourceService;
     }
 
@@ -27,7 +31,13 @@ public class UseAbilityListener implements Listener {
         }
 
         resourceService.set(player.getUniqueId(), ResourceType.MANA, curmana.getValue() - ability.getAbilityCost());
-        ability.run(player);
+        AbilityContext context = new AbilityContext(
+            player,
+            player.getLocation().clone(),
+            statsService,
+            resourceService
+        );
+        ability.run(context);
     }
 
     void handleEvent(Player player, ItemStack item, ActivationType activationType) {
