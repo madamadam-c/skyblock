@@ -1,8 +1,18 @@
 package me.ma.skyblock.stats;
 
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Display.Billboard;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import me.ma.skyblock.Main;
 import me.ma.skyblock.rng.RNG;
 
 public final class DamageService {
@@ -41,6 +51,53 @@ public final class DamageService {
             crit,
             totalMultiplier
         );
+    }
+
+    public void applyMeleeDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getDamageSource().getDirectEntity() instanceof Player player)) return;
+        if (!(event.getEntity() instanceof LivingEntity target)) return;
+        if (player.getScoreboardTags().contains("ability_damage")) return;
+
+        double weaponDamage = event.getDamage();
+        DamageRequest request = new DamageRequest(
+            player,
+            target,
+            weaponDamage,
+            DamageType.MELEE,
+            Set.of("MELEE")
+        );
+
+        DamageResult result = calculate(request);
+        event.setDamage(result.finalDamage());
+    }
+
+    public void showDamagePopup(Player attacker, LivingEntity target, double damage) {
+        UUID key = attacker.getUniqueId();
+        if (Main.getPlugin().getPlayerDamageText().containsKey(key)) {
+            if (Main.getPlugin().getPlayerDamageText().get(key).isValid()) {
+                Main.getPlugin().getPlayerDamageText().get(key).remove();
+            }
+
+            Main.getPlugin().getPlayerDamageText().remove(key);
+        }
+
+        Location spawnLoc = target.getEyeLocation().
+            add(
+            attacker.getLocation().toVector().
+            subtract(target.getEyeLocation().toVector()).
+            normalize().
+            multiply(1.25)
+        );
+
+        TextDisplay display = ((TextDisplay) attacker.getWorld().spawnEntity(spawnLoc, EntityType.TEXT_DISPLAY));
+        display.setText(Double.toString(damage));
+        display.setBillboard(Billboard.CENTER);
+
+        Main.getPlugin().getPlayerDamageText().put(key, display);
+        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), task -> {
+            if (display.isValid()) display.remove();
+            Main.getPlugin().getPlayerDamageText().remove(key, display);
+        }, 60);
     }
 
     public double calculateAbilityDamage(Player attacker,
