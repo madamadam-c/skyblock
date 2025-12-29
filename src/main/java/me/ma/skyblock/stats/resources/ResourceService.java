@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 import me.ma.skyblock.Main;
-import me.ma.skyblock.stats.StatType;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -28,7 +27,8 @@ public final class ResourceService {
 
     private EnumMap<ResourceType, Resource> defaults() {
         return new EnumMap<ResourceType, Resource>(Map.of(
-            ResourceType.MANA, new Resource(100.0, 100.0)
+            ResourceType.MANA, new Resource(100.0, 100.0),
+            ResourceType.HEALTH, new Resource(100.0, 100.0)
         ));
     }
 
@@ -39,9 +39,14 @@ public final class ResourceService {
         perPlayerResources.put(playerID, defaults());
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
-            get(playerID, ResourceType.MANA).setMaxValue(Main.getPlugin().getStatsService().get(playerID, StatType.INTELLIGENCE).getValue() + 100.0);
-            
             for (var key : perPlayerResources.get(playerID).keySet()) {
+                if (key == ResourceType.HEALTH) {
+                    if (Bukkit.getPlayer(playerID) != null) {
+                        set(playerID, key, Bukkit.getPlayer(playerID).getHealth());
+                    }
+                    continue;
+                }
+
                 double increase = get(playerID, key).getMaxValue() * (0.02);
                 set(playerID, key, Math.min(get(playerID, key).getMaxValue(), get(playerID, key).getValue() + increase));
             }
@@ -49,8 +54,12 @@ public final class ResourceService {
             var player = Bukkit.getPlayer(playerID);
             if (player != null) {
                 var inf = get(playerID, ResourceType.MANA);
+                var health = get(playerID, ResourceType.HEALTH);
+
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(
-                    "MANA: " + inf.getValue() + " / " + inf.getMaxValue()
+                    "HEALTH: " + (int) health.getValue() + " / " + (int) health.getMaxValue()
+                    + " " +
+                    "MANA: " + (int) inf.getValue() + " / " + (int) inf.getMaxValue()
                 ));
             }
         }, 20, 20);

@@ -16,6 +16,10 @@ commands:
     description: Give/remove an ability to an item
     usage: /ability <add|remove> ...
     permission: skyblock.admin
+  itemstat:
+    description: Give/remove a stat on an item
+    usage: /itemstat <add|remove> ...
+    permission: skyblock.admin
 permissions:
   skyblock.admin:
     default: op

@@ -8,12 +8,15 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.bukkit.block.Block;
 
 import lombok.Getter;
 import me.ma.skyblock.Main;
+import me.ma.skyblock.stats.DamageService.DamageRequest;
 import me.ma.skyblock.utils.LocationUtils;
 
 public enum Ability {
@@ -84,6 +87,13 @@ public enum Ability {
                 if (b.getType() == Material.ICE) b.setType(Material.AIR);
             }
         }, 60L);
+    }),
+    MAGIC_NOVA("MAGIC_NOVA", 0.0, (Player p) -> {
+        for (Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 3.0, 3.0, 3.0)) {
+            if (!(entity instanceof LivingEntity target)) continue;
+            if (target.equals(p)) continue;
+            Main.getPlugin().getDamageService().damage(new DamageRequest(p, (LivingEntity) entity, true, 10.0));
+        }
     });
 
     private final double manaCost;
@@ -112,6 +122,7 @@ public enum Ability {
             case "INSTANT_TRANSMISSION" -> INSTANT_TRANSMISSION;
             case "BLINK" -> BLINK;
             case "ICE_PRISON" -> ICE_PRISON;
+            case "MAGIC_NOVA" -> MAGIC_NOVA;
             default -> DEFAULT;
         };
     }

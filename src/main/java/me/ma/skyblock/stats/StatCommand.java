@@ -11,7 +11,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     private final StatsService statsService;
 
     private static final List<String> SUBS = List.of("get", "set", "reset");
-    private static final List<String> STAT_NAMES = List.of("strength", "crit_chance", "crit_damage");
+    private static final List<String> STAT_NAMES = List.of(Arrays.stream(StatType.class.getEnumConstants()).map(Enum::name).toArray(String[]::new));
 
     public StatCommand(StatsService statsService) {
         this.statsService = statsService;
@@ -21,7 +21,7 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage("Usage:");
-            sender.sendMessage("/stat get <player> [strength|crit_chance|crit_damage]");
+            sender.sendMessage("/stat get <player> [" + String.join("|", STAT_NAMES) + "]");
             sender.sendMessage("/stat set <player> <stat> <value>");
             sender.sendMessage("/stat reset <player> [stat]");
             return true;
@@ -55,10 +55,9 @@ public final class StatCommand implements CommandExecutor, TabCompleter {
         UUID uuid = target.getUniqueId();
         if (args.length == 2) {
             sender.sendMessage(target.getName() + " stats:");
-            sender.sendMessage("  strength=" + statsService.get(uuid, StatType.STRENGTH).getValue());
-            sender.sendMessage("  crit_chance=" + statsService.get(uuid, StatType.CRIT_CHANCE).getValue());
-            sender.sendMessage("  crit_damage=" + statsService.get(uuid, StatType.CRIT_DAMAGE).getValue());
-            sender.sendMessage("  intelligence=" + statsService.get(uuid, StatType.INTELLIGENCE).getValue());
+            for (var s : StatType.values()) {
+                sender.sendMessage("  " + s.name().toLowerCase() + "=" + statsService.get(uuid, s).getValue());
+            }
             return true;
         }
 
