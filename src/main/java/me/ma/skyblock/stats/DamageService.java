@@ -98,7 +98,7 @@ public final class DamageService {
     }
 
     public DamageResult applyPlayerDefenseMultiplier(DamageRequest request, DamageResult result) {
-        double defense = statsService.get(((Player) request.player()).getUniqueId(), StatType.DEFENSE).getValue();
+        double defense = statsService.get(((Player) request.target()).getUniqueId(), StatType.DEFENSE).getValue();
         double mult = (1.0 - (defense) / (defense + 100.0));
         
         return new DamageResult(result.initialDamage(), result.finalDamage() * mult, false);

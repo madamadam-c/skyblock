@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import me.ma.skyblock.stats.DamageService.DamageRequest;
 
@@ -20,6 +21,7 @@ public final class CalculateDamageListener implements Listener {
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (!(event.getDamageSource().getCausingEntity() instanceof Player p)) return;
         if (!(event.getEntity() instanceof LivingEntity)) return;
+        if (event.getCause() == EntityDamageEvent.DamageCause.CUSTOM) return;
 
         if (p.getScoreboardTags().contains("damage_service")) {
             p.removeScoreboardTag("damage_service");

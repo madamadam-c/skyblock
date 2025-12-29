@@ -82,6 +82,7 @@ public final class ItemStatCommand implements CommandExecutor, TabCompleter {
                     p.sendMessage("Couldn't parse this number: " + args[2]);
                 }
                 
+                Main.getPlugin().getStatsService().updatePlayerEquipmentModifiers(p);
                 return true;
             }
 
@@ -108,6 +109,7 @@ public final class ItemStatCommand implements CommandExecutor, TabCompleter {
                 item.setItemMeta(meta);
 
                 p.sendMessage("Removed stat on " + at.getId() + ".");
+                Main.getPlugin().getStatsService().updatePlayerEquipmentModifiers(p);
                 return true;
             }
 
@@ -116,6 +118,7 @@ public final class ItemStatCommand implements CommandExecutor, TabCompleter {
                 setStatMap(meta, map);
                 item.setItemMeta(meta);
                 p.sendMessage("Cleared all abilities from this item.");
+                Main.getPlugin().getStatsService().updatePlayerEquipmentModifiers(p);
                 return true;
             }
 
