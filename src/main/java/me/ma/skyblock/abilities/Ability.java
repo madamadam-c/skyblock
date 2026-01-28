@@ -20,11 +20,11 @@ import me.ma.skyblock.stats.DamageService.DamageRequest;
 import me.ma.skyblock.utils.LocationUtils;
 
 public enum Ability {
-    DEFAULT("DEFAULT", 0.0, (Player p) -> {}),
-    INSTANT_TRANSMISSION("INSTANT_TRANSMISSION", 50.0, (Player p) -> {
+    DEFAULT("DEFAULT", (Player p) -> {}),
+    INSTANT_TRANSMISSION("INSTANT_TRANSMISSION", (Player p) -> {
         p.teleport(p.getLocation().add(new Vector(0, 1, 0)));
     }),
-    BLINK("BLINK", 25.0, (Player p) -> {
+    BLINK("BLINK", (Player p) -> {
         var w = p.getWorld();
         var dir = p.getLocation().getDirection().clone();
         dir.setY(0);
@@ -63,7 +63,7 @@ public enum Ability {
         if (!LocationUtils.isSafeForPlayer(dest)) return;
         p.teleport(dest);
     }),
-    ICE_PRISON("ICE_PRISON", 45.0, (Player p) -> {
+    ICE_PRISON("ICE_PRISON", (Player p) -> {
         var hit = p.getWorld().rayTraceBlocks(p.getEyeLocation(), p.getEyeLocation().getDirection(), 10.0);
         if (hit == null || hit.getHitBlock() == null) return;
     
@@ -88,7 +88,7 @@ public enum Ability {
             }
         }, 60L);
     }),
-    MAGIC_NOVA("MAGIC_NOVA", 0.0, (Player p) -> {
+    MAGIC_NOVA("MAGIC_NOVA", (Player p) -> {
         for (Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 3.0, 3.0, 3.0)) {
             if (!(entity instanceof LivingEntity target)) continue;
             if (target.equals(p)) continue;
@@ -96,22 +96,16 @@ public enum Ability {
         }
     });
 
-    private final double manaCost;
     private final Consumer<Player> ability;
     @Getter private final String id;
 
-    Ability(String id, double baseCost, Consumer<Player> ability) {
-        this.manaCost = baseCost;
+    Ability(String id, Consumer<Player> ability) {
         this.ability = ability;
         this.id = id;
     }
 
     public void run(Player player) {
         this.ability.accept(player);
-    }
-
-    public double getAbilityCost() {
-        return this.manaCost;
     }
 
     public static Ability parse(String raw) {
